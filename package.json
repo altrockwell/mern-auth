@@ -1,0 +1,21 @@
+{
+	"name": "tdd-auth",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"installServer": "npm install  --prefix server",
+		"installClient": "npm install --prefix client",
+		"install": "npm installServer && npm installClient",
+		"devServer": "npm run dev --prefix server ",
+		"devClient": "npm run dev --prefix client",
+		"dev": "npm run devServer & npm run devClient",
+		"testServer": "npm run test --watch --prefix server",
+		"testClient": "npm run test --watch --prefix client",
+		"test": "npm run testServer & npm run testClient",
+		"buildClient": "npm run build --prefix client"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+}

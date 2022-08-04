@@ -1,0 +1,7 @@
+POST https://localhost:8000/auth/login
+Accept: "application/json"
+
+{
+    "uuid": "a@a.com",
+    "password": "password"
+}
