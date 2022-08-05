@@ -1,5 +1,5 @@
 import { Strategy as LocalStrategy } from 'passport-local';
-import { findOrCreate } from '../../services/user.service';
+import { findOrCreate } from '../../../services/user.service';
 
 const options = {
 	usernameField: 'uuid',

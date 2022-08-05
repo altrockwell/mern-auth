@@ -1,7 +1,12 @@
+import { encryptPassword } from './../utils/bcrypt.util';
 import User, { IUser } from '../models/user.model';
 
 export const create = async (user: IUser) => {
-	const newUser = await new User(user);
+	let password = user.password;
+	if (user.password) {
+		password = await encryptPassword(user.password);
+	}
+	const newUser = await new User({ uuid: user.uuid, name: user.name, password: user.password });
 	await newUser.save();
 	return newUser;
 };
@@ -17,9 +22,5 @@ export const findOrCreate = async (user: IUser) => {
 		const newUser = await create(user);
 		return newUser;
 	}
-	return foundUser;
-};
-export const sampleFind = async (user: IUser) => {
-	const foundUser = await find(user);
 	return foundUser;
 };

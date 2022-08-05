@@ -1,5 +1,7 @@
-const service = require('../../services/user.service');
-import UserModel from '../../models/user.model';
+import { encryptPassword } from './../utils/bcrypt.util';
+let util = require('../utils/bcrypt.util');
+const service = require('./user.service');
+import UserModel from '../models/user.model';
 const mockingoose = require('mockingoose'); // for model related mocking
 
 const user = { uuid: 'a@a.com', name: 'John Doe', password: 'password123' };
@@ -7,9 +9,17 @@ const user = { uuid: 'a@a.com', name: 'John Doe', password: 'password123' };
 beforeEach(() => {
 	mockingoose.resetAll();
 	jest.resetAllMocks();
+	util.encryptPassword = jest.fn();
 });
 
 describe('create', () => {
+	describe('password is provided', () => {
+		test('calls encryptPassword', async () => {
+			await service.create(user);
+			expect(util.encryptPassword).toHaveBeenCalled();
+			expect(util.encryptPassword).toHaveBeenCalledWith(user.password);
+		});
+	});
 	test('return user', async () => {
 		const res = await service.create(user);
 		mockingoose(UserModel).toReturn(user, 'save');
@@ -47,14 +57,5 @@ describe('findOrCreate', () => {
 			expect(service.create).not.toHaveBeenCalled();
 			expect(res).toMatchObject(user);
 		});
-	});
-});
-
-describe('sampleFind', () => {
-	test('should call find function', async () => {
-		service.find = jest.fn().mockResolvedValue(user);
-
-		await service.sampleFind(user);
-		expect(service.find).toHaveBeenCalledWith(user);
 	});
 });

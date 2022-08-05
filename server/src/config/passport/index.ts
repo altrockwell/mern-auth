@@ -1,6 +1,6 @@
 import passport from 'passport';
-import googleStrategy from './google.strategy';
-import localStrategy from './local.strategy';
+import googleStrategy from './googleStrategy/google.strategy';
+import localStrategy from './localStrategy/local.strategy';
 
 export default function () {
 	passport.use(localStrategy);

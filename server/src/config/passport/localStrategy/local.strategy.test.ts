@@ -1,5 +1,5 @@
-import { verify } from './../../config/passport/local.strategy';
-const service = require('./../../services/user.service');
+import { verify } from './local.strategy';
+const service = require('../../../services/user.service');
 
 let done: any;
 beforeEach(() => {
