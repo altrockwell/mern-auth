@@ -1,12 +1,12 @@
 import https from 'https';
 import fs from 'fs';
 import app from './app';
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
+import * as db from './startapp/db';
 
 const port = process.env.APP_PORT || 8000;
-mongoose.connect('mongodb://127.0.0.1:27017/mern_auth', () => {
-	console.log('Connected to Database');
-});
+
+db.connect();
 
 const server = https.createServer(
 	{ key: fs.readFileSync('key.pem'), cert: fs.readFileSync('cert.pem') },

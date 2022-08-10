@@ -1,8 +1,9 @@
 import express from 'express';
 import morgan from 'morgan';
 import passport from 'passport';
-import userRouter from './routes/user.router';
+import userRouter from './modules/user/user.router';
 import passportConfig from './config/passport';
+require('dotenv').config();
 
 passportConfig();
 

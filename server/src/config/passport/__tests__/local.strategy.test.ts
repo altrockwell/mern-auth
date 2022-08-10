@@ -1,4 +1,4 @@
-import { verify } from './local.strategy';
+import { verify } from '../local.strategy';
 const service = require('../../../services/user.service');
 
 let done: any;

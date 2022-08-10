@@ -1,5 +1,5 @@
 import { Strategy as LocalStrategy } from 'passport-local';
-import { findOrCreate } from '../../../services/user.service';
+import User from '../../modules/user/user.model';
 
 const options = {
 	usernameField: 'uuid',
@@ -8,7 +8,11 @@ const options = {
 };
 export const verify = async (username: string, password: string, done: any) => {
 	try {
-		const user = await findOrCreate({ uuid: username, password: password, name: username });
+		const user = await User.findOne({ uuid: username });
+		console.log(user);
+		if (!user) {
+			return done(null, false);
+		}
 		return done(null, user);
 	} catch (error) {
 		return done(error, false);
