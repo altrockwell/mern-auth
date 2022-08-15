@@ -1,5 +1,5 @@
 const service = require('./../../../services/user.service');
-import { verify } from './google.strategy';
+import { verify } from './__tests__/google.strategy';
 
 let done: any;
 const sampleProfile = {
