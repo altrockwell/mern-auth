@@ -16,7 +16,7 @@ export async function connect() {
 	return mongoose
 		.connect(db)
 		.then(() => {
-			if (process.env.NODE_ENV !== 'test') {
+			if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
 				console.log(`Connected to ${db}`);
 			}
 		})
