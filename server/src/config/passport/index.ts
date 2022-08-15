@@ -1,5 +1,5 @@
 import passport from 'passport';
-import googleStrategy from './__tests__/google.strategy';
+import googleStrategy from './google.strategy';
 import localStrategy from './local.strategy';
 import jwtStrategy from './jwt.strategy';
 

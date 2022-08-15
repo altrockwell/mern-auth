@@ -1,8 +1,7 @@
-import { isPasswordValid } from './../user.utils';
-import { issueJWT, encryptPassword } from '../user.utils';
-import UserModel, { IUser } from '../user.model';
-import * as db from '../../../startapp/db';
-import User from '../user.model';
+import { isPasswordValid } from '../../modules/user/user.utils';
+import { issueJWT, encryptPassword } from '../../modules/user/user.utils';
+import * as db from '../../startapp/db';
+import User, { IUser } from '../../modules/user/user.model';
 import { Document, Types } from 'mongoose';
 const jsonWebToken = require('jsonwebtoken');
 
@@ -28,9 +27,6 @@ describe('User Utils', () => {
 		test('it will return token and expiration', async () => {
 			const jwt = await issueJWT(user);
 
-			// console.log(jwt);
-
-			expect(jwt).not.toBe(undefined);
 			expect(jwt).toBeTruthy();
 			expect(jwt).toHaveProperty('token');
 			expect(jwt).toHaveProperty('expires');

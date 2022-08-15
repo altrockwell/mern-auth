@@ -36,7 +36,6 @@ export const issueJWT = async (user: HydratedDocument<IUser>) => {
 			expires: expiresIn,
 		};
 	} catch (error) {
-		return { token: '', expires: '' };
 		throw new Error(`${error}`);
 	}
 };

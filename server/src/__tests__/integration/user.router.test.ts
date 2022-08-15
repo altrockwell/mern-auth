@@ -1,12 +1,10 @@
 import jsonWebToken from 'jsonwebtoken';
-const request = require('supertest');
-const util = require('../user.utils');
-import app from '../../../app';
-import dbSetUp from '../../../dbSetUp';
+import app from '../../app';
+import dbSetUp from '../../dbSetUp';
+import User from '../../modules/user/user.model';
+import { issueJWT } from '../../modules/user/user.utils';
 
-import { issueJWT } from '../user.utils';
-import User, { IUser } from '../user.model';
-import { Document, ObjectId, Types } from 'mongoose';
+const request = require('supertest');
 
 dbSetUp();
 
@@ -63,13 +61,10 @@ describe('User Router Test', () => {
 				expect(findNewUser).toBeTruthy();
 			});
 			test('if jwt token is issued', async () => {
-				util.issueJWT = jest.fn().mockResolvedValueOnce({ token: 'token', expires: 'expires' });
-
 				const res = await exec();
 
-				expect(util.issueJWT).toBeCalled();
-				expect(res.body).toHaveProperty('token', 'token');
-				expect(res.body).toHaveProperty('expires', 'expires');
+				expect(res.body).toHaveProperty('token');
+				expect(res.body).toHaveProperty('expires');
 			});
 		});
 	});
@@ -108,15 +103,11 @@ describe('User Router Test', () => {
 				expect(user).toBeTruthy();
 			});
 			test('if jwt token is issued', async () => {
-				util.issueJWT = jest.fn().mockResolvedValueOnce({ token: 'token', expires: 'expires' });
-
-				const findUser = await User.findOne({ uuid: sampleUser.uuid });
 				const res = await exec();
 
-				expect(util.issueJWT).toHaveBeenCalled();
-				expect(util.issueJWT.mock.calls[0][0]).toMatchObject(findUser as any);
-				expect(res.body).toHaveProperty('token', 'token');
-				expect(res.body).toHaveProperty('expires', 'expires');
+				expect(res.body.token).toBeTruthy();
+				expect(res.body.token).toMatch(/Bearer/);
+				expect(res.body.expires).toBeTruthy();
 			});
 		});
 	});
@@ -145,15 +136,9 @@ describe('User Router Test', () => {
 		describe('request will succeed', () => {
 			test('if authorization header sent is valid', async () => {
 				const user = await new User(sampleUser).save();
-				const payload = {
-					sub: {
-						id: user._id,
-						uuid: user.uuid,
-					},
-					iat: Date.now(),
-				};
-				const jwt = await jsonWebToken.sign(payload, 'secret', { expiresIn: `2 days` });
-				token = 'Bearer ' + jwt;
+				const jwt = await issueJWT(user);
+				token = jwt.token;
+
 				const res = await exec();
 
 				expect(res.statusCode).toBe(200);
