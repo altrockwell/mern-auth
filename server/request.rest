@@ -1,7 +1,5 @@
-POST https://localhost:8000/auth/login
-Accept: "application/json"
+POST https://localhost:8000/auth/google
 
-{
-    "uuid": "a@a.com",
-    "password": "password"
-}
+
+###
+GET https://localhost:8000/auth/google/callback?code=somecode&scope=profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile

@@ -1,10 +1,10 @@
-import jsonWebToken from 'jsonwebtoken';
+import request, { Response } from 'supertest';
 import app from '../../app';
 import dbSetUp from '../../dbSetUp';
 import User from '../../modules/user/user.model';
 import { issueJWT } from '../../modules/user/user.utils';
-
-const request = require('supertest');
+const passport = require('passport');
+const util = require('../../modules/user/user.utils');
 
 dbSetUp();
 
@@ -144,5 +144,128 @@ describe('User Router Test', () => {
 				expect(res.statusCode).toBe(200);
 			});
 		});
+	});
+
+	describe('GET /auth/google --> redirected', () => {
+		const exec = () => {
+			return request(app).get('/auth/google');
+		};
+		test('user will be redirected to google auth', async () => {
+			const res = await exec();
+
+			expect(res.statusCode).toBe(302);
+			expect(res.headers.location).toMatch(/accounts.google.com/);
+		});
+	});
+
+	describe('GET /auth/google/callback --> userToken', () => {
+		let code: string;
+		let scope: string;
+		const exec = () => {
+			return request(app).get(`/auth/google/callback?code=${code || ''}&scope=${scope || ''}`);
+		};
+
+		describe('request will be fail', () => {
+			test('if code and scope is missing', async () => {
+				const res = await exec();
+
+				expect(res.statusCode).toBe(400);
+			});
+		});
+		describe('request will succeed', () => {
+			beforeEach(() => {
+				code = 'someValidCode';
+				scope = 'someValidScope';
+				util.issueJWT = jest.fn();
+			});
+			afterEach(() => {
+				jest.resetAllMocks();
+			});
+			test('if code and scope is provided', async () => {
+				const res = await exec();
+
+				expect(res.statusCode).toBe(200);
+			});
+			test('if passport authenticate is called', async () => {
+				passport.authenticate = jest.fn();
+				await exec();
+
+				expect(passport.authenticate).toHaveBeenCalled();
+				expect(passport.authenticate.mock.calls[0][0]).toMatch(/google/);
+			});
+			test('if jwt token is issued and returned', async () => {
+				util.issueJWT = jest.fn();
+
+				const res = await exec();
+
+				expect(util.issueJWT).toHaveBeenCalled();
+				expect(res.body).toHaveProperty('token');
+				expect(res.body).toHaveProperty('expires');
+			});
+		});
+	});
+
+	describe('GET /auth/facebook', () => {
+		const exec = () => {
+			return request(app).get('/auth/facebook');
+		};
+
+		test('user will be redirected', async () => {
+			const res = await exec();
+
+			expect(res.statusCode).toBe(302);
+			expect(res.headers.location).toMatch(
+				/https:\u002F\u002Fwww.facebook.com\u002Fv3.2\u002Fdialog\u002Foauth/
+			);
+		});
+	});
+
+	describe('GET /auth/facebook/callback', () => {
+		let code: string;
+		const exec = () => {
+			return request(app).get(`/auth/facebook/callback?code=${code || ''}`);
+		};
+
+		describe('request will be denied ', () => {
+			test('if code is missing', async () => {
+				const res = await exec();
+
+				expect(res.statusCode).toBe(400);
+			});
+		});
+		describe('request will be succeed ', () => {
+			test('if code is provided', async () => {
+				code = 'someValidCode';
+				// passport.authenticate = jest.fn();
+				const res = await exec();
+
+				expect(res.statusCode).toBe(200);
+			});
+			test('if passport authenticate is called', async () => {
+				passport.authenticate = jest.fn();
+				await exec();
+
+				expect(passport.authenticate).toHaveBeenCalled();
+				expect(passport.authenticate.mock.calls[0][0]).toMatch(/facebook/);
+			});
+			test('if jwt token is issued and returned', async () => {
+				util.issueJWT = jest.fn();
+
+				const res = await exec();
+
+				expect(util.issueJWT).toHaveBeenCalled();
+				expect(res.body).toHaveProperty('token');
+				expect(res.body).toHaveProperty('expires');
+			});
+		});
+
+		// test('redirect user to login to facebook if no code is provided', async () => {
+		// 	const res = await exec();
+		// 	// console.log(res.headers.location);
+		// 	expect(res.statusCode).toBe(302);
+		// 	expect(res.headers.location).toMatch(
+		// 		/https:\u002F\u002Fwww.facebook.com\u002Fv3.2\u002Fdialog\u002Foauth/
+		// 	);
+		// });
 	});
 });

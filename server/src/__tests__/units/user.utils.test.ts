@@ -35,7 +35,7 @@ describe('User Utils', () => {
 			jsonWebToken.sign = jest.fn(() => {
 				throw new Error();
 			});
-			// const jwt = await issueJWT(user);
+
 			expect(() => issueJWT(user)).rejects.toThrowError();
 			expect(jsonWebToken.sign).toBeCalled();
 		});
